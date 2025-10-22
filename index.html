@@ -1,0 +1,2092 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halloween I Spy</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        html, body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #2d1b69 50%, #8b2635 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        body {
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Haunted House Background */
+        .haunted-house {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 200px;
+            z-index: -10;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .house-main {
+            width: 200px;
+            height: 120px;
+            background: #1a1a1a;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .house-roof {
+            width: 0;
+            height: 0;
+            border-left: 120px solid transparent;
+            border-right: 120px solid transparent;
+            border-bottom: 80px solid #0d0d0d;
+            position: absolute;
+            bottom: 120px;
+            left: 30px;
+        }
+
+        .house-tower {
+            width: 60px;
+            height: 80px;
+            background: #1a1a1a;
+            position: absolute;
+            bottom: 120px;
+            left: 0;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .tower-roof {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 50px solid #0d0d0d;
+            position: absolute;
+            bottom: 80px;
+            left: -10px;
+        }
+
+        .window {
+            width: 20px;
+            height: 25px;
+            background: #ffaa00;
+            position: absolute;
+            border-radius: 3px;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+
+        .window1 { bottom: 60px; left: 30px; }
+        .window2 { bottom: 60px; right: 30px; }
+        .window3 { bottom: 30px; left: 15px; }
+        .tower-window { bottom: 40px; left: 20px; width: 15px; height: 20px; }
+
+        .door {
+            width: 25px;
+            height: 40px;
+            background: #0d0d0d;
+            position: absolute;
+            bottom: 0;
+            left: 87px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* Floating Ghosts */
+        .ghost {
+            position: fixed;
+            width: 40px;
+            height: 50px;
+            z-index: -10;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .ghost-body {
+            width: 40px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .ghost-tail {
+            width: 40px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            position: absolute;
+            bottom: -15px;
+            clip-path: polygon(0% 0%, 20% 100%, 40% 0%, 60% 100%, 80% 0%, 100% 100%, 100% 0%);
+        }
+
+        .ghost-eyes {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+        }
+
+        .ghost-eye {
+            width: 6px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+        }
+
+        .ghost-mouth {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 22px;
+            left: 16px;
+        }
+
+        .ghost1 {
+            top: 20%;
+            left: 10%;
+        }
+
+        .ghost2 {
+            top: 60%;
+            right: 15%;
+        }
+
+        .ghost3 {
+            top: 40%;
+            left: 80%;
+        }
+
+        /* Flying Bats */
+        .bat {
+            position: fixed;
+            width: 30px;
+            height: 20px;
+            z-index: -10;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .bat-body {
+            width: 8px;
+            height: 12px;
+            background: #1a1a1a;
+            position: absolute;
+            left: 11px;
+            top: 4px;
+            border-radius: 4px;
+        }
+
+        .bat-wing {
+            width: 15px;
+            height: 10px;
+            background: #1a1a1a;
+            position: absolute;
+            top: 2px;
+            border-radius: 8px 2px 8px 2px;
+        }
+
+        .bat-wing-left {
+            left: 0;
+            transform-origin: right center;
+        }
+
+        .bat-wing-right {
+            right: 0;
+            transform-origin: left center;
+        }
+
+        .bat1 {
+            top: 15%;
+            left: 5%;
+        }
+
+        .bat2 {
+            top: 25%;
+            right: 10%;
+        }
+
+        .bat3 {
+            top: 70%;
+            left: 20%;
+        }
+
+        .bat4 {
+            top: 35%;
+            right: 5%;
+        }
+
+        /* Spooky Fog Effect */
+        .fog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 100px;
+            background: linear-gradient(to top, rgba(200, 200, 255, 0.1) 0%, transparent 100%);
+            z-index: -10;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: visible;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b35, #8b2635);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+        }
+
+        .item-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .round-indicator {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .game-content {
+            padding: 30px;
+        }
+
+        .setup-screen, .game-screen, .results-screen {
+            text-align: center;
+        }
+
+        .setup-screen input {
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin: 10px;
+            width: 250px;
+            max-width: 90%;
+        }
+
+        .setup-screen input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b35, #8b2635);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffa502, #ff6348);
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 20px 0;
+        }
+
+        .game-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .pin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff6b35;
+            border: 3px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: pinDrop 0.3s ease-out;
+        }
+
+        @keyframes pinDrop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff6b35;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timer.warning {
+            color: #ff4757;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .players-list {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .player-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-correct {
+            background: #2ed573;
+            color: white;
+        }
+
+        .status-incorrect {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .status-waiting {
+            background: #ffa502;
+            color: white;
+        }
+
+        .winners-section {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .winners-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .winner-name {
+            font-size: 1.2rem;
+            margin: 8px 0;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .round-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .round-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes correctLocationPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1); 
+                box-shadow: 0 4px 12px rgba(46, 213, 115, 0.5);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2); 
+                box-shadow: 0 6px 20px rgba(46, 213, 115, 0.8);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .timer {
+                font-size: 2.5rem;
+            }
+            
+            .game-content {
+                padding: 20px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body><!-- Spooky Background Elements -->
+  <div class="haunted-house">
+   <div class="house-main">
+    <div class="window window1"></div>
+    <div class="window window2"></div>
+    <div class="window window3"></div>
+    <div class="door"></div>
+   </div>
+   <div class="house-roof"></div>
+   <div class="house-tower">
+    <div class="window tower-window"></div>
+   </div>
+   <div class="tower-roof"></div>
+  </div><!-- Floating Ghosts -->
+  <div class="ghost ghost1">
+   <div class="ghost-body">
+    <div class="ghost-eyes">
+     <div class="ghost-eye"></div>
+     <div class="ghost-eye"></div>
+    </div>
+    <div class="ghost-mouth"></div>
+   </div>
+   <div class="ghost-tail"></div>
+  </div>
+  <div class="ghost ghost2">
+   <div class="ghost-body">
+    <div class="ghost-eyes">
+     <div class="ghost-eye"></div>
+     <div class="ghost-eye"></div>
+    </div>
+    <div class="ghost-mouth"></div>
+   </div>
+   <div class="ghost-tail"></div>
+  </div>
+  <div class="ghost ghost3">
+   <div class="ghost-body">
+    <div class="ghost-eyes">
+     <div class="ghost-eye"></div>
+     <div class="ghost-eye"></div>
+    </div>
+    <div class="ghost-mouth"></div>
+   </div>
+   <div class="ghost-tail"></div>
+  </div><!-- Flying Bats -->
+  <div class="bat bat1">
+   <div class="bat-wing bat-wing-left"></div>
+   <div class="bat-body"></div>
+   <div class="bat-wing bat-wing-right"></div>
+  </div>
+  <div class="bat bat2">
+   <div class="bat-wing bat-wing-left"></div>
+   <div class="bat-body"></div>
+   <div class="bat-wing bat-wing-right"></div>
+  </div>
+  <div class="bat bat3">
+   <div class="bat-wing bat-wing-left"></div>
+   <div class="bat-body"></div>
+   <div class="bat-wing bat-wing-right"></div>
+  </div>
+  <div class="bat bat4">
+   <div class="bat-wing bat-wing-left"></div>
+   <div class="bat-body"></div>
+   <div class="bat-wing bat-wing-right"></div>
+  </div><!-- Spooky Fog -->
+  <div class="fog"></div>
+  <div class="game-container">
+   <div class="header" id="gameHeader">
+    <h1 class="game-title" id="gameTitle">Halloween I Spy</h1>
+    <p class="item-description" id="itemDescription">Find the red apple in the image</p>
+    <div class="round-indicator" id="roundIndicator">
+     Round 1 of 4
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+    </div>
+   </div>
+   <div class="header" id="titleHeader">
+    <h1 class="game-title">🎃 Halloween I Spy</h1>
+    <p class="item-description">Solve the riddle to find the item!</p>
+   </div>
+   <div class="game-content"><!-- Mode Selection Screen -->
+    <div id="modeSelectionScreen" class="setup-screen">
+     <h2>🎃 Welcome to Halloween I Spy!</h2>
+     <div style="background: #f8f9fa; border-radius: 15px; padding: 25px; margin: 20px 0; text-align: left;">
+      <h3 style="color: #333; margin-top: 0;">📋 How to Play:</h3>
+      <ul style="color: #555; line-height: 1.6;">
+       <li><strong>4 Spooky Rounds:</strong> Each round has a different item to find</li>
+       <li><strong>Time Limits:</strong> Rounds 1-2 have 30 seconds, Rounds 3-4 have 45 seconds</li>
+       <li><strong>Click to Guess:</strong> Click where you think the hidden item is located</li>
+       <li><strong>Scoring:</strong> Get points for each correct guess within the time limit</li>
+       <li><strong>Winners:</strong> Players with the most rounds won are crowned champions!</li>
+      </ul>
+      <div style="background: #ff6b35; color: white; padding: 15px; border-radius: 10px; margin-top: 15px;"><strong>🎃 Tip:</strong> Look carefully at the entire image - spooky items can be anywhere!
+      </div>
+     </div>
+     <div style="display: flex; justify-content: center; margin: 30px 0;">
+      <div style="background: white; border: 2px solid #8b2635; border-radius: 15px; padding: 40px; max-width: 400px; text-align: center;">
+       <h3 style="color: #8b2635; margin-top: 0;">👑 Start a New Game</h3>
+       <p style="color: #666; margin-bottom: 25px;">Create a new Halloween I Spy game and get a shareable link to invite players</p><button class="btn btn-danger" id="joinAsMasterBtn" style="font-size: 1.2rem; padding: 18px 35px;">🎮 Start New Game</button>
+      </div>
+     </div>
+    </div><!-- Shared Link Mode Selection Screen -->
+    <div id="sharedLinkModeScreen" class="setup-screen hidden">
+     <h2>🎃 Join Halloween I Spy Game!</h2>
+     <div style="background: #e8f5e8; border: 2px solid #2ed573; border-radius: 15px; padding: 25px; margin: 20px 0;">
+      <h3 style="color: #2ed573; margin-top: 0;">🔗 You've been invited to play!</h3>
+      <p style="color: #666; margin-bottom: 15px;">Someone shared this game with you. Choose how you'd like to join:</p>
+     </div>
+     <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 30px 0;">
+      <div style="background: white; border: 2px solid #ff6b35; border-radius: 15px; padding: 25px; max-width: 300px; text-align: center;">
+       <h3 style="color: #ff6b35; margin-top: 0;">🎮 Join as Player</h3>
+       <p style="color: #666; margin-bottom: 20px;">Play the game and compete with others</p><button class="btn" id="joinAsPlayerBtn">Join as Player</button>
+      </div>
+      <div style="background: white; border: 2px solid #8b2635; border-radius: 15px; padding: 25px; max-width: 300px; text-align: center;">
+       <h3 style="color: #8b2635; margin-top: 0;">👑 Take Control</h3>
+       <p style="color: #666; margin-bottom: 20px;">Become the game master and control rounds</p><button class="btn btn-danger" id="takeControlBtn">Take Control</button>
+      </div>
+     </div>
+    </div><!-- Player Join Screen -->
+    <div id="playerJoinScreen" class="setup-screen hidden">
+     <h2>🎮 Join as Player</h2>
+     <form id="playerForm"><input type="text" id="playerNameInput" placeholder="Enter your name to start playing" required> <br><button type="submit" class="btn" id="joinBtn">🎮 Join Game</button>
+     </form><button class="btn btn-secondary" id="backToModeBtn">← Back to Mode Selection</button>
+    </div><!-- Setup Screen -->
+    <div id="setupScreen" class="setup-screen hidden">
+     <h2>Game Lobby</h2>
+     <p>Welcome! You're ready to play.</p><!-- Player Count Display -->
+     <div id="playerCountDisplay" style="background: linear-gradient(135deg, #ff6b35, #8b2635); color: white; border-radius: 15px; padding: 20px; margin: 20px 0; text-align: center;">
+      <h3 style="margin: 0 0 10px 0; font-size: 1.5rem;">👥 Players Joined</h3>
+      <div style="font-size: 3rem; font-weight: bold; margin: 10px 0;" id="playerCount">
+       0
+      </div>
+      <div style="opacity: 0.9; font-size: 1rem;" id="playerCountSubtext">
+       Waiting for players to join...
+      </div>
+      <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; margin-top: 15px; font-size: 0.9rem;">
+       💡 <strong>Tip:</strong> Use the "Share Game Link" button below to invite others to join your game!
+      </div>
+     </div><!-- Live Players List -->
+     <div id="playersListContainer" style="background: #f8f9fa; border-radius: 15px; padding: 20px; margin: 20px 0; text-align: left;">
+      <h3 style="color: #333; margin-top: 0; text-align: center;">🎮 Current Players</h3>
+      <div id="currentPlayersList">
+       <div style="text-align: center; color: #666; padding: 20px;">
+        No players have joined yet
+       </div>
+      </div>
+     </div>
+     <div id="adminControls"><button class="btn btn-success" id="startGameBtn">Start Round 1</button>
+      <div style="background: #e8f5e8; border: 2px solid #2ed573; border-radius: 10px; padding: 15px; margin: 15px 0;">
+       <h4 style="color: #2ed573; margin: 0 0 10px 0;">🔗 Invite Players</h4>
+       <p style="color: #666; margin: 0 0 10px 0; font-size: 0.9rem;">Click the button below to get a shareable link that other players can use to join your game:</p><button class="btn" id="shareGameBtn" style="background: linear-gradient(135deg, #2ed573, #1e90ff);">📤 Get Share Link</button>
+      </div><button class="btn btn-secondary" id="coordinateFinderBtn">🎯 Coordinate Finder</button>
+     </div>
+     <div id="playerControls" class="hidden">
+      <p>Waiting for game master to start the round...</p>
+      <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0;">
+       <h3>🎮 Player Mode</h3>
+       <p>You're in player mode. The game master will control when rounds start.</p><button class="btn" id="switchToMasterBtn">Switch to Game Master Mode</button>
+      </div>
+     </div>
+    </div><!-- Coordinate Finder Screen -->
+    <div id="coordinateFinderScreen" class="setup-screen hidden">
+     <h2>🎯 Coordinate Finder Tool</h2>
+     <p>Click on the image to find the exact coordinates for hidden items!</p>
+     <div class="coordinate-controls" style="margin: 20px 0;"><label for="roundSelect" style="margin-right: 10px;">Select Round:</label> <select id="roundSelect" style="padding: 8px; border-radius: 5px; border: 2px solid #ddd; margin-right: 15px;"> <option value="1">Round 1</option> <option value="2">Round 2</option> <option value="3">Round 3</option> <option value="4">Round 4</option> </select> <button class="btn btn-secondary" id="loadRoundImageBtn">Load Image</button>
+     </div>
+     <div class="image-container"><img id="coordinateImage" class="game-image" src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&amp;h=600&amp;fit=crop" alt="Coordinate Finding Image" style="cursor: crosshair;">
+     </div>
+     <div id="coordinateDisplay" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: left;">
+      <h3>📍 Current Coordinates:</h3>
+      <div style="font-family: monospace; font-size: 1.1rem; background: white; padding: 15px; border-radius: 8px; margin: 10px 0;"><strong>X:</strong> <span id="currentX">--</span>% &nbsp;&nbsp;&nbsp; <strong>Y:</strong> <span id="currentY">--</span>%
+      </div>
+      <div style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+       💡 <strong>Tip:</strong> Click exactly on the center of the item you want players to find. The coordinates will automatically update and can be copied to your game settings.
+      </div>
+     </div><button class="btn" id="backToLobbyBtn">← Back to Game Lobby</button>
+    </div><!-- Game Screen -->
+    <div id="gameScreen" class="game-screen hidden">
+     <div class="timer" id="timer">
+      15
+     </div>
+     <div class="image-container"><img id="gameImage" class="game-image" src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&amp;h=600&amp;fit=crop" alt="Game Image">
+     </div>
+     <p id="gameInstructions">Click on the image where you think the item is hidden!</p>
+    </div><!-- Results Screen -->
+    <div id="resultsScreen" class="results-screen hidden"><!-- Round Review Section -->
+     <div id="roundReviewSection" style="margin-bottom: 30px;">
+      <h2 id="resultsTitle">Round 1 Complete</h2><!-- Round Answer Reveal -->
+      <div style="background: linear-gradient(135deg, #ff6b35, #8b2635); color: white; border-radius: 15px; padding: 25px; margin: 20px 0;">
+       <h3 style="margin: 0 0 15px 0; font-size: 1.5rem;">🎯 The Answer Was...</h3>
+       <div id="roundAnswerText" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 15px;">
+        The answer will appear here
+       </div><!-- Image with Correct Location -->
+       <div class="image-container" style="margin: 20px 0;"><img id="reviewImage" class="game-image" src="" alt="Round Review Image" style="cursor: default;">
+       </div><!-- Round Statistics -->
+       <div id="roundStats" style="background: rgba(255,255,255,0.2); border-radius: 10px; padding: 20px; margin-top: 20px;">
+        <h4 style="margin: 0 0 15px 0; font-size: 1.2rem;">📊 Round Statistics</h4>
+        <div id="roundStatsContent">
+         Statistics will appear here
+        </div>
+       </div>
+      </div>
+     </div>
+     <div id="nextRoundControls">
+      <p>Get ready for the next round!</p>
+      <div id="masterNextRoundControls"><button class="btn btn-success" id="nextRoundBtn">Start Next Round</button>
+      </div>
+      <div id="playerNextRoundControls" class="hidden">
+       <p>Waiting for game master to start the next round...</p>
+      </div>
+     </div>
+     <div id="finalGameControls" class="hidden">
+      <div id="championSection" class="winners-section">
+       <div class="winners-title">
+        🏆 GAME CHAMPIONS
+       </div>
+       <div id="championsList"></div>
+      </div>
+      <div class="round-summary">
+       <div class="round-header">
+        📊 Final Leaderboard
+       </div>
+       <div id="finalScores"></div>
+      </div>
+      <div class="round-summary">
+       <div class="round-header">
+        ⚡ Speed Records
+       </div>
+       <div id="speedRecords"></div>
+      </div>
+      <div id="masterFinalControls"><button class="btn" id="newGameBtn">Start New Game</button>
+      </div>
+      <div id="playerFinalControls" class="hidden">
+       <p>Game complete! Thanks for playing.</p><button class="btn btn-secondary" id="switchModeBtn">Switch to Game Master</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Configuration
+        const defaultConfig = {
+            game_title: "Halloween I Spy",
+            game_subtitle: "Solve the riddle to find the item!",
+            round_1_item: "Bright as a banana with horns like bubblegum. I can be cute, loud, and maybe a little scary! What am I?",
+            round_1_image: "https://i.imgur.com/TBVwmGL.jpeg",
+            round_1_x: "24.4",
+            round_1_y: "34.7",
+            round_2_item: "Lit by a virgin, dark as night. I wake the wicked 3 with my light! What am I?",
+            round_2_image: "https://i.imgur.com/eg6TTGJ.png",
+            round_2_x: "89.6",
+            round_2_y: "55.5",
+            round_3_item: "I float with fear, not filled with air—where clowns lurk, I'm always there. What am I?",
+            round_3_image: "https://i.imgur.com/7iPVbyv.jpeg",
+            round_3_x: "72.6",
+            round_3_y: "5.3",
+            round_4_item: "I'm often tall yet I never grow, a pointed peak where magic seems to flow in fall nights I'm a familiar sight What am I?",
+            round_4_image: "https://i.imgur.com/tW1i1gx.png",
+            round_4_x: "29.9",
+            round_4_y: "59.1"
+        };
+
+        // Game state
+        let gameState = 'setup'; // setup, playing, results
+        let currentRound = 1;
+        let totalRounds = 4;
+        let timeLeft = 30;
+        let timerInterval = null;
+        let currentGameSession = '';
+        let playerGuesses = [];
+        let hasGuessed = false;
+        let playerScores = new Map(); // Track scores across rounds
+        let roundStartTime = null; // Track when round started
+        let playerStats = new Map(); // Track detailed player statistics
+        let userMode = 'none'; // 'player', 'master', 'none'
+
+        // Data SDK handler
+        const dataHandler = {
+            onDataChanged(data) {
+                playerGuesses = data.filter(guess => guess.game_session === currentGameSession);
+                updatePlayersDisplay();
+                updateScores();
+                updatePlayerCount();
+            }
+        };
+
+        // Global SDK initialization state
+        let sdkInitialized = false;
+        let sdkInitPromise = null;
+
+        // Initialize SDKs
+        async function initializeApp() {
+            // Show loading message
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'error-message';
+            loadingDiv.style.background = '#ffa502';
+            loadingDiv.innerHTML = '🎮 Loading game system... <span class="loading"></span>';
+            
+            const gameContent = document.querySelector('.game-content');
+            gameContent.insertBefore(loadingDiv, gameContent.firstChild);
+            
+            // Create initialization promise if not already created
+            if (!sdkInitPromise) {
+                sdkInitPromise = initializeDataSDK();
+            }
+            
+            try {
+                await sdkInitPromise;
+                
+                // Remove loading message
+                if (loadingDiv.parentNode) {
+                    loadingDiv.remove();
+                }
+                
+                // Show success message
+                showSuccessMessage("🎮 Game system ready! You can now join or start a game.");
+                console.log('Data SDK initialized successfully');
+                
+            } catch (error) {
+                // Remove loading message
+                if (loadingDiv.parentNode) {
+                    loadingDiv.remove();
+                }
+                console.error("Error initializing Data SDK:", error);
+                showError("Game system failed to load. Please refresh the page and try again.");
+                return;
+            }
+        }
+
+        // Separate function to handle Data SDK initialization
+        async function initializeDataSDK() {
+            if (sdkInitialized) {
+                return; // Already initialized
+            }
+            
+            // Wait for Data SDK to be available with longer timeout
+            let attempts = 0;
+            const maxAttempts = 150; // 15 seconds total
+            
+            while (!window.dataSdk && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.dataSdk) {
+                throw new Error('Data SDK not available after waiting');
+            }
+            
+            console.log('Data SDK found, attempting to initialize...');
+            const dataResult = await window.dataSdk.init(dataHandler);
+            console.log('Data SDK init result:', dataResult);
+            
+            if (dataResult && dataResult.isOk) {
+                sdkInitialized = true;
+                console.log('Data SDK initialized successfully');
+            } else {
+                throw new Error(`Data SDK initialization failed: ${dataResult?.error || 'Unknown error'}`);
+            }
+        }
+
+        // Ensure SDK is ready before any operations
+        async function ensureSDKReady() {
+            if (sdkInitialized) {
+                return true;
+            }
+            
+            if (!sdkInitPromise) {
+                sdkInitPromise = initializeDataSDK();
+            }
+            
+            try {
+                await sdkInitPromise;
+                return true;
+            } catch (error) {
+                console.error('SDK initialization failed:', error);
+                return false;
+            }
+        }
+
+            // Initialize Element SDK
+            if (window.elementSdk) {
+                await window.elementSdk.init({
+                    defaultConfig,
+                    render: async (config) => {
+                        // Update main title
+                        document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+                        
+                        // Update subtitle on title page
+                        const titleSubtitle = document.querySelector('#titleScreen .item-description');
+                        if (titleSubtitle) {
+                            titleSubtitle.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+                        }
+                        
+                        updateCurrentRoundDisplay();
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [],
+                        borderables: [],
+                        fontEditable: undefined,
+                        fontSizeable: undefined
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["game_title", config.game_title || defaultConfig.game_title],
+                        ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+                        ["round_1_item", config.round_1_item || defaultConfig.round_1_item],
+                        ["round_1_image", config.round_1_image || defaultConfig.round_1_image],
+                        ["round_1_x", config.round_1_x || defaultConfig.round_1_x],
+                        ["round_1_y", config.round_1_y || defaultConfig.round_1_y],
+                        ["round_2_item", config.round_2_item || defaultConfig.round_2_item],
+                        ["round_2_image", config.round_2_image || defaultConfig.round_2_image],
+                        ["round_2_x", config.round_2_x || defaultConfig.round_2_x],
+                        ["round_2_y", config.round_2_y || defaultConfig.round_2_y],
+                        ["round_3_item", config.round_3_item || defaultConfig.round_3_item],
+                        ["round_3_image", config.round_3_image || defaultConfig.round_3_image],
+                        ["round_3_x", config.round_3_x || defaultConfig.round_3_x],
+                        ["round_3_y", config.round_3_y || defaultConfig.round_3_y],
+                        ["round_4_item", config.round_4_item || defaultConfig.round_4_item],
+                        ["round_4_image", config.round_4_image || defaultConfig.round_4_image],
+                        ["round_4_x", config.round_4_x || defaultConfig.round_4_x],
+                        ["round_4_y", config.round_4_y || defaultConfig.round_4_y]
+                    ])
+                });
+            }
+
+            setupEventListeners();
+            updateCurrentRoundDisplay();
+            updatePlayerCount(); // Initialize player count display
+            
+            // Clear all stats
+            playerStats.clear();
+        }
+
+        function setupEventListeners() {
+            // Mode selection
+            document.getElementById('joinAsPlayerBtn').addEventListener('click', () => setUserMode('player'));
+            document.getElementById('joinAsMasterBtn').addEventListener('click', () => setUserMode('master'));
+            document.getElementById('takeControlBtn').addEventListener('click', () => setUserMode('master'));
+            document.getElementById('backToModeBtn').addEventListener('click', () => {
+                // Check if this is a shared link - if so, don't allow going back
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionFromUrl = urlParams.get('session');
+                const isSharedLink = sessionFromUrl && sessionFromUrl.startsWith('game_');
+                
+                if (!isSharedLink) {
+                    setUserMode('none');
+                } else {
+                    // For shared links, go back to shared link mode screen
+                    document.getElementById('playerJoinScreen').classList.add('hidden');
+                    document.getElementById('sharedLinkModeScreen').classList.remove('hidden');
+                }
+            });
+            document.getElementById('switchToMasterBtn').addEventListener('click', () => setUserMode('master'));
+            document.getElementById('switchModeBtn').addEventListener('click', () => setUserMode('master'));
+            
+            // Player form
+            document.getElementById('playerForm').addEventListener('submit', handlePlayerJoin);
+            
+            // Game controls
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            document.getElementById('nextRoundBtn').addEventListener('click', startNextRound);
+            document.getElementById('newGameBtn').addEventListener('click', resetGame);
+            document.getElementById('coordinateFinderBtn').addEventListener('click', showCoordinateFinder);
+            document.getElementById('backToLobbyBtn').addEventListener('click', backToLobby);
+            document.getElementById('shareGameBtn').addEventListener('click', shareGameLink);
+            
+            // Coordinate finder
+            document.getElementById('loadRoundImageBtn').addEventListener('click', loadRoundImage);
+            document.getElementById('coordinateImage').addEventListener('click', handleCoordinateClick);
+            
+            // Image click
+            document.getElementById('gameImage').addEventListener('click', handleImageClick);
+            
+            // Image error handling
+            document.getElementById('gameImage').addEventListener('error', function() {
+                this.src = '';
+                this.alt = 'Image failed to load - please check the image URL in settings';
+                this.style.display = 'none';
+                showError('Image failed to load. Please check the image URL in the game settings.');
+            });
+        }
+
+        function setUserMode(mode) {
+            userMode = mode;
+            
+            if (mode === 'none') {
+                // Show mode selection screen (Start New Game only)
+                document.getElementById('modeSelectionScreen').classList.remove('hidden');
+                document.getElementById('sharedLinkModeScreen').classList.add('hidden');
+                document.getElementById('playerJoinScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('titleHeader').classList.remove('hidden');
+                document.getElementById('gameHeader').classList.add('hidden');
+            } else if (mode === 'shared_link') {
+                // Show shared link mode selection screen
+                document.getElementById('modeSelectionScreen').classList.add('hidden');
+                document.getElementById('sharedLinkModeScreen').classList.remove('hidden');
+                document.getElementById('playerJoinScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('titleHeader').classList.add('hidden');
+                document.getElementById('gameHeader').classList.remove('hidden');
+            } else if (mode === 'player') {
+                // Show player join screen
+                document.getElementById('modeSelectionScreen').classList.add('hidden');
+                document.getElementById('sharedLinkModeScreen').classList.add('hidden');
+                document.getElementById('playerJoinScreen').classList.remove('hidden');
+                document.getElementById('setupScreen').classList.add('hidden');
+            } else if (mode === 'master') {
+                // Show master setup screen
+                document.getElementById('modeSelectionScreen').classList.add('hidden');
+                document.getElementById('sharedLinkModeScreen').classList.add('hidden');
+                document.getElementById('playerJoinScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.remove('hidden');
+                document.getElementById('titleHeader').classList.add('hidden');
+                document.getElementById('gameHeader').classList.remove('hidden');
+                
+                // Show master controls
+                document.getElementById('adminControls').classList.remove('hidden');
+                document.getElementById('playerControls').classList.add('hidden');
+            }
+            
+            updateControlsVisibility();
+        }
+
+        function updateControlsVisibility() {
+            // Update results screen controls based on user mode
+            if (userMode === 'master') {
+                document.getElementById('masterNextRoundControls').classList.remove('hidden');
+                document.getElementById('playerNextRoundControls').classList.add('hidden');
+                document.getElementById('masterFinalControls').classList.remove('hidden');
+                document.getElementById('playerFinalControls').classList.add('hidden');
+            } else if (userMode === 'player') {
+                document.getElementById('masterNextRoundControls').classList.add('hidden');
+                document.getElementById('playerNextRoundControls').classList.remove('hidden');
+                document.getElementById('masterFinalControls').classList.add('hidden');
+                document.getElementById('playerFinalControls').classList.remove('hidden');
+                
+                // Show player controls in setup
+                document.getElementById('adminControls').classList.add('hidden');
+                document.getElementById('playerControls').classList.remove('hidden');
+            }
+        }
+
+        function generateGameSession() {
+            // Check if there's a session ID in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionFromUrl = urlParams.get('session');
+            
+            // Check if this looks like a shared game link
+            const isSharedLink = sessionFromUrl && sessionFromUrl.startsWith('game_');
+            
+            if (isSharedLink) {
+                // Use the exact session from URL
+                currentGameSession = sessionFromUrl;
+                
+                console.log('Joining existing game session:', currentGameSession);
+                
+                // Set user mode to indicate this is a shared link
+                userMode = 'shared_link';
+                
+                // Show the joining shared game message
+                showSuccessMessage('🔗 You\'ve been invited to join a Halloween I Spy game! Choose how you\'d like to participate.');
+            } else {
+                // Create new game session
+                currentGameSession = 'game_' + Date.now();
+                
+                // Update URL with session ID for sharing
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('session', currentGameSession);
+                window.history.replaceState({}, '', newUrl);
+                
+                console.log('Created new game session:', currentGameSession);
+                
+                // Set user mode to none for fresh visits
+                userMode = 'none';
+            }
+            
+            currentRound = 1;
+            playerScores.clear();
+        }
+
+        function getCurrentRoundConfig() {
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            return {
+                item: config[`round_${currentRound}_item`] || defaultConfig[`round_${currentRound}_item`],
+                image: config[`round_${currentRound}_image`] || defaultConfig[`round_${currentRound}_image`],
+                x: config[`round_${currentRound}_x`] || defaultConfig[`round_${currentRound}_x`],
+                y: config[`round_${currentRound}_y`] || defaultConfig[`round_${currentRound}_y`]
+            };
+        }
+
+        function updateCurrentRoundDisplay() {
+            const roundConfig = getCurrentRoundConfig();
+            document.getElementById('itemDescription').textContent = roundConfig.item;
+            document.getElementById('roundIndicator').textContent = `Round ${currentRound} of ${totalRounds}`;
+            document.getElementById('progressFill').style.width = `${(currentRound / totalRounds) * 100}%`;
+            
+            // Update timer display based on round
+            const timerDuration = getRoundTimer(currentRound);
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.textContent = timerDuration;
+            }
+            
+            const gameImage = document.getElementById('gameImage');
+            if (roundConfig.image && roundConfig.image !== gameImage.src) {
+                gameImage.src = roundConfig.image;
+            }
+
+            // Update button text
+            const startBtn = document.getElementById('startGameBtn');
+            if (startBtn) {
+                startBtn.textContent = `Start Round ${currentRound}`;
+            }
+
+            // Update results title
+            document.getElementById('resultsTitle').textContent = `Round ${currentRound} Complete`;
+        }
+
+        async function handlePlayerJoin(e) {
+            e.preventDefault();
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            
+            if (!playerName) return;
+
+            const joinBtn = document.getElementById('joinBtn');
+            joinBtn.disabled = true;
+            joinBtn.innerHTML = 'Joining... <span class="loading"></span>';
+
+            // Ensure SDK is properly initialized before proceeding
+            const sdkReady = await ensureSDKReady();
+            
+            if (!sdkReady) {
+                showError("Game system is not ready. Please refresh the page and try again.");
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = '🎮 Join Game';
+                return;
+            }
+
+            // Check if player already exists in current game session for current round
+            const existingPlayer = playerGuesses.find(p => 
+                p.player_name === playerName && 
+                p.game_session === currentGameSession &&
+                p.round_number === currentRound
+            );
+
+            if (existingPlayer) {
+                showError("A player with that name has already joined this game. Please choose a different name.");
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = '🎮 Join Game';
+                return;
+            }
+
+            // Check if we're at the limit
+            const uniquePlayers = [...new Set(playerGuesses.map(p => p.player_name))];
+            if (uniquePlayers.length >= 999) {
+                showError("Maximum limit of 999 players reached. Please start a new game.");
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = '🎮 Join Game';
+                return;
+            }
+
+            // Initialize player score and stats
+            if (!playerScores.has(playerName)) {
+                playerScores.set(playerName, 0);
+                playerStats.set(playerName, {
+                    correctAnswers: 0,
+                    totalTime: 0,
+                    fastestTime: Infinity,
+                    roundTimes: []
+                });
+            }
+
+            try {
+                console.log('Attempting to join game with session:', currentGameSession);
+                
+                // Add player to waiting list for current round
+                const playerData = {
+                    player_name: playerName,
+                    x_coordinate: 0,
+                    y_coordinate: 0,
+                    timestamp: new Date().toISOString(),
+                    is_correct: false,
+                    game_session: currentGameSession,
+                    round_number: currentRound,
+                    response_time: 0
+                };
+                
+                console.log('Creating player record:', playerData);
+                const result = await window.dataSdk.create(playerData);
+                console.log('Create result:', result);
+
+                if (result && result.isOk) {
+                    console.log('Player joined successfully');
+                    
+                    // Hide player join screen and show setup screen
+                    document.getElementById('playerJoinScreen').classList.add('hidden');
+                    document.getElementById('setupScreen').classList.remove('hidden');
+                    document.getElementById('titleHeader').classList.add('hidden');
+                    document.getElementById('gameHeader').classList.remove('hidden');
+                    
+                    // Show success message in green
+                    showSuccessMessage(`Successfully joined as "${playerName}"! Waiting for game master to start.`);
+                    
+                    // Update controls visibility for player mode
+                    updateControlsVisibility();
+                    
+                    // Clear the input field
+                    document.getElementById('playerNameInput').value = '';
+                } else {
+                    console.error('Join failed with result:', result);
+                    const errorMsg = result?.error?.message || result?.error || 'Unknown error occurred';
+                    
+                    // Try to provide more helpful error messages
+                    if (errorMsg.includes('limit') || errorMsg.includes('999')) {
+                        showError("Player limit reached. Please try a different game or start a new one.");
+                    } else if (errorMsg.includes('duplicate') || errorMsg.includes('exists')) {
+                        showError("That player name is already taken. Please choose a different name.");
+                    } else {
+                        showError(`Unable to join game: ${errorMsg}. Please try again or refresh the page.`);
+                    }
+                    
+                    joinBtn.disabled = false;
+                    joinBtn.innerHTML = '🎮 Join Game';
+                }
+            } catch (error) {
+                console.error("Error joining game:", error);
+                
+                // More specific error handling
+                let errorMessage = "Unable to join game. Please try again.";
+                
+                if (error.message && error.message.includes("not available")) {
+                    errorMessage = "Game system is not ready. Please wait a moment and try again.";
+                } else if (error.name === "NetworkError" || error.message.includes("fetch")) {
+                    errorMessage = "Network connection issue. Please check your connection and try again.";
+                } else if (error.name === "TypeError") {
+                    errorMessage = "System error occurred. Please refresh the page and try again.";
+                }
+                
+                showError(errorMessage);
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = '🎮 Join Game';
+            }
+        }
+
+        function getRoundTimer(round) {
+            // Rounds 1-2: 30 seconds, Rounds 3-4: 45 seconds
+            return round <= 2 ? 30 : 45;
+        }
+
+        function startGame() {
+            gameState = 'playing';
+            timeLeft = getRoundTimer(currentRound);
+            roundStartTime = Date.now(); // Track when round started
+            hasGuessed = false;
+            currentSelection = null; // Reset selection for new round
+            
+            // Hide setup screen and show game screen
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            
+            // Reset instructions
+            document.getElementById('gameInstructions').textContent = 'Click on the image where you think the item is hidden!';
+            
+            // Remove any existing guess pins from game screen
+            const existingPins = document.querySelectorAll('#gameScreen .pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            updateCurrentRoundDisplay();
+            startTimer();
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = timeLeft;
+            timerElement.classList.remove('warning');
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerElement.classList.add('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    endRound();
+                }
+            }, 1000);
+        }
+
+        async function endRound() {
+            clearInterval(timerInterval);
+            
+            // Auto-submit any pending selection
+            await autoSubmitSelection();
+            
+            gameState = 'results';
+            
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            calculateResults();
+            showRoundReview();
+            
+            // Show appropriate controls
+            if (currentRound < totalRounds) {
+                document.getElementById('nextRoundControls').classList.remove('hidden');
+                document.getElementById('finalGameControls').classList.add('hidden');
+            } else {
+                document.getElementById('nextRoundControls').classList.add('hidden');
+                document.getElementById('finalGameControls').classList.remove('hidden');
+                showFinalResults();
+            }
+        }
+
+        async function startNextRound() {
+            currentRound++;
+            
+            // Ensure SDK is ready
+            const sdkReady = await ensureSDKReady();
+            if (!sdkReady) {
+                showError("Game system not ready. Please refresh the page.");
+                return;
+            }
+            
+            // Add existing players to new round
+            const existingPlayers = [...new Set(playerGuesses.map(p => p.player_name))];
+            
+            for (const playerName of existingPlayers) {
+                if (playerGuesses.filter(p => p.round_number === currentRound).length < 999) {
+                    await window.dataSdk.create({
+                        player_name: playerName,
+                        x_coordinate: 0,
+                        y_coordinate: 0,
+                        timestamp: new Date().toISOString(),
+                        is_correct: false,
+                        game_session: currentGameSession,
+                        round_number: currentRound,
+                        response_time: 0
+                    });
+                }
+            }
+            
+            updateCurrentRoundDisplay();
+            startGame();
+        }
+
+        // Store current selection
+        let currentSelection = null;
+
+        async function handleImageClick(e) {
+            if (gameState !== 'playing' || hasGuessed) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            // Store the selection
+            currentSelection = {
+                x: x,
+                y: y,
+                pixelX: e.clientX - rect.left,
+                pixelY: e.clientY - rect.top
+            };
+            
+            // Add visual pin to show selection
+            addGuessPin(currentSelection.pixelX, currentSelection.pixelY);
+            
+            // Update instructions and show submit button
+            document.getElementById('gameInstructions').innerHTML = `
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin: 10px 0;">
+                    <p style="margin: 0 0 10px 0; color: #333;">📍 Selection made! Click elsewhere to change or submit your guess:</p>
+                    <button class="btn btn-success" id="submitGuessBtn" onclick="submitGuess()">✅ Submit Guess</button>
+                    <button class="btn btn-secondary" id="changeSelectionBtn" onclick="clearSelection()">🔄 Change Selection</button>
+                </div>
+            `;
+        }
+
+        function clearSelection() {
+            currentSelection = null;
+            
+            // Remove guess pins from game screen
+            const existingPins = document.querySelectorAll('#gameScreen .pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Reset instructions
+            document.getElementById('gameInstructions').textContent = 'Click on the image where you think the item is hidden!';
+        }
+
+        async function submitGuess() {
+            if (!currentSelection || hasGuessed) return;
+            
+            const submitBtn = document.getElementById('submitGuessBtn');
+            const changeBtn = document.getElementById('changeSelectionBtn');
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Submitting... <span class="loading"></span>';
+            }
+            if (changeBtn) {
+                changeBtn.disabled = true;
+            }
+            
+            // Ensure SDK is ready
+            const sdkReady = await ensureSDKReady();
+            if (!sdkReady) {
+                showError("Game system not ready. Please refresh the page.");
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '✅ Submit Guess';
+                }
+                if (changeBtn) {
+                    changeBtn.disabled = false;
+                }
+                return;
+            }
+            
+            // Calculate response time in seconds
+            const responseTime = (Date.now() - roundStartTime) / 1000;
+            
+            // Find current player's record for this round and update it
+            const currentPlayer = playerGuesses.find(p => 
+                p.game_session === currentGameSession && 
+                p.round_number === currentRound
+            );
+            
+            if (currentPlayer) {
+                const updatedPlayer = {
+                    ...currentPlayer,
+                    x_coordinate: currentSelection.x,
+                    y_coordinate: currentSelection.y,
+                    timestamp: new Date().toISOString(),
+                    response_time: responseTime
+                };
+                
+                const result = await window.dataSdk.update(updatedPlayer);
+                if (result.isOk) {
+                    hasGuessed = true;
+                    document.getElementById('gameInstructions').innerHTML = `
+                        <div style="background: #2ed573; color: white; border-radius: 10px; padding: 15px; margin: 10px 0;">
+                            ✅ Guess submitted in ${responseTime.toFixed(1)}s! Waiting for round to end...
+                        </div>
+                    `;
+                } else {
+                    showError("Failed to submit guess. Please try again.");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '✅ Submit Guess';
+                    }
+                    if (changeBtn) {
+                        changeBtn.disabled = false;
+                    }
+                }
+            }
+        }
+
+        // Auto-submit when time runs out
+        async function autoSubmitSelection() {
+            if (currentSelection && !hasGuessed) {
+                await submitGuess();
+            }
+        }
+
+        function addGuessPin(x, y) {
+            // Remove existing guess pins from game screen
+            const existingPins = document.querySelectorAll('#gameScreen .pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Add new guess pin
+            const pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.left = x + 'px';
+            pin.style.top = y + 'px';
+            pin.style.background = '#ff6b35'; // Orange color for guess pins
+            pin.style.border = '3px solid white';
+            pin.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.5)';
+            
+            document.querySelector('#gameScreen .image-container').appendChild(pin);
+        }
+
+        function addPin(x, y) {
+            // Remove existing pins
+            const existingPins = document.querySelectorAll('.pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Add new pin
+            const pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.left = x + 'px';
+            pin.style.top = y + 'px';
+            
+            document.querySelector('.image-container').appendChild(pin);
+        }
+
+        function calculateResults() {
+            const roundConfig = getCurrentRoundConfig();
+            const correctX = parseFloat(roundConfig.x);
+            const correctY = parseFloat(roundConfig.y);
+            const tolerance = 10; // 10% tolerance
+            
+            const currentRoundGuesses = playerGuesses.filter(p => p.round_number === currentRound);
+            
+            currentRoundGuesses.forEach(async (player) => {
+                const distance = Math.sqrt(
+                    Math.pow(player.x_coordinate - correctX, 2) + 
+                    Math.pow(player.y_coordinate - correctY, 2)
+                );
+                
+                const isCorrect = distance <= tolerance;
+                
+                if (player.is_correct !== isCorrect) {
+                    const updatedPlayer = {
+                        ...player,
+                        is_correct: isCorrect
+                    };
+                    await window.dataSdk.update(updatedPlayer);
+                }
+            });
+        }
+
+        function updateScores() {
+            // Update player scores and stats based on correct answers
+            playerGuesses.forEach(guess => {
+                if (guess.is_correct) {
+                    const currentScore = playerScores.get(guess.player_name) || 0;
+                    playerScores.set(guess.player_name, Math.max(currentScore, guess.round_number));
+                    
+                    // Update detailed stats
+                    const stats = playerStats.get(guess.player_name) || {
+                        correctAnswers: 0,
+                        totalTime: 0,
+                        fastestTime: Infinity,
+                        roundTimes: []
+                    };
+                    
+                    // Only count each round once
+                    if (!stats.roundTimes.some(rt => rt.round === guess.round_number)) {
+                        stats.correctAnswers++;
+                        stats.totalTime += guess.response_time;
+                        stats.fastestTime = Math.min(stats.fastestTime, guess.response_time);
+                        stats.roundTimes.push({
+                            round: guess.round_number,
+                            time: guess.response_time
+                        });
+                        playerStats.set(guess.player_name, stats);
+                    }
+                }
+            });
+        }
+
+        function showRoundReview() {
+            const roundConfig = getCurrentRoundConfig();
+            const correctX = parseFloat(roundConfig.x);
+            const correctY = parseFloat(roundConfig.y);
+            
+            // Update answer text
+            document.getElementById('roundAnswerText').textContent = roundConfig.item;
+            
+            // Update review image
+            const reviewImage = document.getElementById('reviewImage');
+            reviewImage.src = roundConfig.image;
+            
+            // Add correct location pin to review image
+            setTimeout(() => {
+                addCorrectLocationPin(reviewImage, correctX, correctY);
+            }, 100);
+            
+            // Calculate and show round statistics
+            const currentRoundGuesses = playerGuesses.filter(p => p.round_number === currentRound);
+            const correctGuesses = currentRoundGuesses.filter(p => p.is_correct);
+            const totalPlayers = currentRoundGuesses.length;
+            
+            let statsHtml = '';
+            
+            if (totalPlayers > 0) {
+                const correctPercentage = ((correctGuesses.length / totalPlayers) * 100).toFixed(1);
+                const averageTime = currentRoundGuesses.reduce((sum, p) => sum + p.response_time, 0) / totalPlayers;
+                const fastestTime = Math.min(...currentRoundGuesses.map(p => p.response_time));
+                
+                statsHtml = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; text-align: center;">
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">${correctGuesses.length}/${totalPlayers}</div>
+                            <div style="opacity: 0.9; font-size: 0.9rem;">Players Correct</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">${correctPercentage}%</div>
+                            <div style="opacity: 0.9; font-size: 0.9rem;">Success Rate</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">${averageTime.toFixed(1)}s</div>
+                            <div style="opacity: 0.9; font-size: 0.9rem;">Average Time</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">${fastestTime.toFixed(1)}s</div>
+                            <div style="opacity: 0.9; font-size: 0.9rem;">Fastest Time</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show who got it right
+                if (correctGuesses.length > 0) {
+                    const winners = correctGuesses
+                        .sort((a, b) => a.response_time - b.response_time)
+                        .map((guess, index) => {
+                            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '✅';
+                            return `${medal} ${guess.player_name} (${guess.response_time.toFixed(1)}s)`;
+                        });
+                    
+                    statsHtml += `
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                            <h5 style="margin: 0 0 10px 0; font-size: 1rem;">🏆 Round Winners:</h5>
+                            <div style="text-align: left;">
+                                ${winners.map(winner => `<div style="margin: 5px 0;">${winner}</div>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                statsHtml = '<div style="text-align: center; opacity: 0.8;">No players participated in this round</div>';
+            }
+            
+            document.getElementById('roundStatsContent').innerHTML = statsHtml;
+        }
+
+        function addCorrectLocationPin(imageElement, correctX, correctY) {
+            // Remove existing pins from review image
+            const existingPins = document.querySelectorAll('#reviewImage + .pin, #roundReviewSection .pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Calculate pixel position
+            const rect = imageElement.getBoundingClientRect();
+            const pixelX = (correctX / 100) * imageElement.offsetWidth;
+            const pixelY = (correctY / 100) * imageElement.offsetHeight;
+            
+            // Create correct location pin
+            const pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.position = 'absolute';
+            pin.style.left = pixelX + 'px';
+            pin.style.top = pixelY + 'px';
+            pin.style.background = '#2ed573'; // Green for correct location
+            pin.style.border = '3px solid white';
+            pin.style.boxShadow = '0 4px 12px rgba(46, 213, 115, 0.5)';
+            pin.style.zIndex = '10';
+            
+            // Add pulsing animation for emphasis
+            pin.style.animation = 'correctLocationPulse 2s ease-in-out infinite';
+            
+            // Add the pin to the image container
+            const imageContainer = imageElement.parentElement;
+            imageContainer.style.position = 'relative';
+            imageContainer.appendChild(pin);
+        }
+
+        function updatePlayersDisplay() {
+            // No longer showing round-by-round results
+            // Results are only shown at the end of the game
+        }
+
+        function updatePlayerCount() {
+            // Get unique players from current game session
+            const uniquePlayers = [...new Set(playerGuesses.map(p => p.player_name))];
+            const playerCount = uniquePlayers.length;
+            
+            // Update count display
+            document.getElementById('playerCount').textContent = playerCount;
+            
+            // Update subtext based on count
+            const subtextElement = document.getElementById('playerCountSubtext');
+            if (playerCount === 0) {
+                subtextElement.textContent = 'Waiting for players to join...';
+            } else if (playerCount === 1) {
+                subtextElement.textContent = '1 player ready to play!';
+            } else {
+                subtextElement.textContent = `${playerCount} players ready to play!`;
+            }
+            
+            // Update players list
+            const playersListElement = document.getElementById('currentPlayersList');
+            if (playerCount === 0) {
+                playersListElement.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        No players have joined yet
+                    </div>
+                `;
+            } else {
+                playersListElement.innerHTML = uniquePlayers.map((playerName, index) => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${playerName}</span>
+                        <span class="player-status status-waiting">Ready</span>
+                    </div>
+                `).join('');
+            }
+            
+            // Update start button text to show player count
+            const startBtn = document.getElementById('startGameBtn');
+            if (startBtn) {
+                if (playerCount === 0) {
+                    startBtn.textContent = `Start Round ${currentRound}`;
+                } else {
+                    startBtn.textContent = `Start Round ${currentRound} (${playerCount} players)`;
+                }
+            }
+        }
+
+        function showFinalResults() {
+            // Calculate champions (most correct answers, then fastest average time)
+            const champions = [...playerStats.entries()]
+                .filter(([name, stats]) => stats.correctAnswers > 0)
+                .sort((a, b) => {
+                    const [nameA, statsA] = a;
+                    const [nameB, statsB] = b;
+                    
+                    // First sort by number of correct answers (descending)
+                    if (statsB.correctAnswers !== statsA.correctAnswers) {
+                        return statsB.correctAnswers - statsA.correctAnswers;
+                    }
+                    
+                    // Then by average time (ascending - faster is better)
+                    const avgTimeA = statsA.totalTime / statsA.correctAnswers;
+                    const avgTimeB = statsB.totalTime / statsB.correctAnswers;
+                    return avgTimeA - avgTimeB;
+                });
+
+            // Show champions
+            const championsList = document.getElementById('championsList');
+            if (champions.length > 0) {
+                const topChampions = champions.slice(0, 3);
+                championsList.innerHTML = topChampions.map(([name, stats], index) => {
+                    const avgTime = (stats.totalTime / stats.correctAnswers).toFixed(1);
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                    return `
+                        <div class="winner-name">
+                            ${medal} ${name}<br>
+                            <small style="opacity: 0.9;">${stats.correctAnswers}/${totalRounds} correct • ${avgTime}s avg</small>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                championsList.innerHTML = '<div class="winner-name">No champions this game</div>';
+            }
+
+            // Show detailed leaderboard
+            const finalScores = document.getElementById('finalScores');
+            const sortedScores = [...playerStats.entries()].sort((a, b) => {
+                const [nameA, statsA] = a;
+                const [nameB, statsB] = b;
+                
+                if (statsB.correctAnswers !== statsA.correctAnswers) {
+                    return statsB.correctAnswers - statsA.correctAnswers;
+                }
+                
+                const avgTimeA = statsA.correctAnswers > 0 ? statsA.totalTime / statsA.correctAnswers : Infinity;
+                const avgTimeB = statsB.correctAnswers > 0 ? statsB.totalTime / statsB.correctAnswers : Infinity;
+                return avgTimeA - avgTimeB;
+            });
+            
+            finalScores.innerHTML = sortedScores.map(([playerName, stats], index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                const avgTime = stats.correctAnswers > 0 ? (stats.totalTime / stats.correctAnswers).toFixed(1) : 'N/A';
+                return `
+                    <div class="player-item">
+                        <span class="player-name">${medal} ${playerName}</span>
+                        <span class="player-status status-correct">
+                            ${stats.correctAnswers}/${totalRounds} • Avg: ${avgTime}s
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            // Show speed records
+            const speedRecords = document.getElementById('speedRecords');
+            const fastestTimes = [...playerStats.entries()]
+                .filter(([name, stats]) => stats.fastestTime !== Infinity)
+                .sort((a, b) => a[1].fastestTime - b[1].fastestTime)
+                .slice(0, 5);
+
+            if (fastestTimes.length > 0) {
+                speedRecords.innerHTML = fastestTimes.map(([name, stats], index) => {
+                    const lightning = index === 0 ? '⚡' : '🏃';
+                    return `
+                        <div class="player-item">
+                            <span class="player-name">${lightning} ${name}</span>
+                            <span class="player-status status-correct">${stats.fastestTime.toFixed(1)}s</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                speedRecords.innerHTML = '<div class="player-item"><span class="player-name">No speed records</span></div>';
+            }
+        }
+
+        async function resetGame() {
+            clearInterval(timerInterval);
+            gameState = 'setup';
+            currentRound = 1;
+            timeLeft = getRoundTimer(1);
+            roundStartTime = null;
+            hasGuessed = false;
+            currentSelection = null;
+            
+            // Clear all game data
+            playerGuesses = [];
+            playerScores.clear();
+            playerStats.clear();
+            
+            // Hide game elements
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('coordinateFinderScreen').classList.add('hidden');
+            
+            // Clear form inputs
+            document.getElementById('playerNameInput').value = '';
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('gameInstructions').textContent = 'Click on the image where you think the item is hidden!';
+            
+            // Remove pins
+            const existingPins = document.querySelectorAll('.pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Generate new game session and update URL
+            generateGameSession();
+            updateCurrentRoundDisplay();
+            updatePlayerCount();
+            
+            // Reset to mode selection screen
+            setUserMode('none');
+            
+            // Show success message
+            showSuccessMessage("🎮 New game created! You can now invite players or start playing.");
+        }
+
+        function showCoordinateFinder() {
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('coordinateFinderScreen').classList.remove('hidden');
+            
+            // Load the current round's image
+            loadRoundImage();
+        }
+
+        function backToLobby() {
+            document.getElementById('coordinateFinderScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+        }
+
+        function loadRoundImage() {
+            const selectedRound = document.getElementById('roundSelect').value;
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const imageUrl = config[`round_${selectedRound}_image`] || defaultConfig[`round_${selectedRound}_image`];
+            
+            const coordinateImage = document.getElementById('coordinateImage');
+            coordinateImage.src = imageUrl;
+            
+            // Clear previous coordinates
+            document.getElementById('currentX').textContent = '--';
+            document.getElementById('currentY').textContent = '--';
+            
+            // Remove existing pins
+            const existingPins = document.querySelectorAll('.pin');
+            existingPins.forEach(pin => pin.remove());
+        }
+
+        function handleCoordinateClick(e) {
+            const rect = e.target.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            // Update coordinate display
+            document.getElementById('currentX').textContent = x.toFixed(1);
+            document.getElementById('currentY').textContent = y.toFixed(1);
+            
+            // Add visual pin to show where was clicked
+            addCoordinatePin(e.clientX - rect.left, e.clientY - rect.top);
+            
+            // Show helpful message
+            showError(`📍 Coordinates found! X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}% - You can now use these values in your game settings.`);
+        }
+
+        function addCoordinatePin(x, y) {
+            // Remove existing pins from coordinate finder
+            const existingPins = document.querySelectorAll('#coordinateFinderScreen .pin');
+            existingPins.forEach(pin => pin.remove());
+            
+            // Add new pin
+            const pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.left = x + 'px';
+            pin.style.top = y + 'px';
+            pin.style.background = '#2ed573'; // Different color for coordinate finder
+            
+            document.querySelector('#coordinateFinderScreen .image-container').appendChild(pin);
+        }
+
+        function shareGameLink() {
+            const gameUrl = window.location.href;
+            
+            // Try to copy to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(gameUrl).then(() => {
+                    showSuccessMessage("🔗 Game link copied to clipboard! Share this URL with other players so they can join your game.");
+                }).catch(() => {
+                    showGameLinkModal(gameUrl);
+                });
+            } else {
+                showGameLinkModal(gameUrl);
+            }
+        }
+
+        function showGameLinkModal(gameUrl) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; text-align: center;">
+                    <h3 style="color: #333; margin-top: 0;">🔗 Share Game Link</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Copy this link and share it with other players:</p>
+                    <div style="background: #f8f9fa; border: 2px solid #ddd; border-radius: 8px; padding: 15px; margin: 15px 0; font-family: monospace; word-break: break-all; font-size: 0.9rem;">
+                        ${gameUrl}
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn" onclick="selectGameUrl(this)">📋 Select All</button>
+                        <button class="btn btn-secondary" onclick="closeModal(this)">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function selectGameUrl(button) {
+            const urlDiv = button.parentElement.previousElementSibling;
+            const range = document.createRange();
+            range.selectNodeContents(urlDiv);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            showSuccessMessage("🔗 Game link selected! Press Ctrl+C (or Cmd+C on Mac) to copy.");
+        }
+
+        function closeModal(button) {
+            const modal = button.closest('[style*="position: fixed"]');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function showSuccessMessage(message) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.error-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'error-message';
+            successDiv.style.background = '#2ed573';
+            successDiv.textContent = message;
+            
+            // Insert at the top of game content
+            const gameContent = document.querySelector('.game-content');
+            gameContent.insertBefore(successDiv, gameContent.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.remove();
+                }
+            }, 5000);
+        }
+
+        function showError(message) {
+            // Remove existing error messages
+            const existingErrors = document.querySelectorAll('.error-message');
+            existingErrors.forEach(error => error.remove());
+            
+            // Create new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            // Insert at the top of game content
+            const gameContent = document.querySelector('.game-content');
+            gameContent.insertBefore(errorDiv, gameContent.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Check for shared link first, before setting user mode
+                generateGameSession();
+                
+                // Set the appropriate user mode based on URL
+                if (userMode === 'shared_link') {
+                    setUserMode('shared_link');
+                } else {
+                    setUserMode('none');
+                }
+                
+                // Setup basic event listeners first
+                setupEventListeners();
+                updateCurrentRoundDisplay();
+                updatePlayerCount();
+                
+                // Initialize SDK in background
+                initializeApp().catch(error => {
+                    console.error('SDK initialization failed:', error);
+                    showError('Game system failed to load. Some features may not work properly.');
+                });
+                
+            } catch (error) {
+                console.error('App initialization error:', error);
+                showError('Failed to initialize game. Please refresh the page.');
+            }
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99292cde9201cf6a',t:'MTc2MTEzODAwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
